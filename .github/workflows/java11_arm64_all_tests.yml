@@ -1,0 +1,40 @@
+name: Run building and testing Alluxio on ARM64
+
+on:
+  pull_request:
+    branches:
+      - master
+
+env:
+  ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+  SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
+  REGION: "ap-southeast-3"
+  PROJECT_ID: "c847fb717563484fa95d18a75ae7831c"
+  CLUSTER_ID: "670c106f-9036-11eb-8437-0255ac1001d6"
+  ALLUXIO_IMG: "ghcr.io/liusheng/alluxio-aarch64:latest"
+
+jobs:
+  build-on-arm64:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Get kubectl
+        run: |
+          curl -sL https://dl.k8s.io/v1.19.0/kubernetes-client-linux-amd64.tar.gz | tar zx -C $HOME/
+          export PATH=PATH:$HOME/kubernetes/client/bin
+
+      - uses: liusheng/cce-context@v1
+        with:
+          region: "${{ env.REGION }}"
+          access-key-id: "${{ env.ACCESS_KEY_ID }}"
+          access-key-secret: "${{ env.SECRET_ACCESS_KEY }}"
+          project-id: "${{ env.PROJECT_ID }}"
+          cluster-id: "${{ env.CLUSTER_ID }}"
+
+      - name: Run with specific image
+        run: |-
+          kubectl config use-context external
+          kubectl run --rm -i --privileged=true --image "${{ env.ALLUXIO_IMG }}" alluxio-build-$RANDOM
