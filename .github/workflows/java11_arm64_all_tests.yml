@@ -26,7 +26,7 @@ jobs:
           curl -sL https://dl.k8s.io/v1.19.0/kubernetes-client-linux-amd64.tar.gz | tar zx -C $HOME/
           export PATH=PATH:$HOME/kubernetes/client/bin
 
-      - uses: huaweicloud/cce-cluster-credentials@v1
+      - uses: liusheng/cce-cluster-credentials@v1
         with:
           region: "${{ env.REGION }}"
           access-key-id: "${{ env.ACCESS_KEY_ID }}"
